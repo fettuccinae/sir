@@ -20,7 +20,6 @@ from sqlalchemy.orm.query import Query
 
 
 logger = getLogger("sir")
-DUPLICATION_ALLOWED_FIELD_NAMES = ["tracksmedium"]
 
 
 def is_composite_column(model, colname):
@@ -118,7 +117,7 @@ class SearchField(object):
         3. `gid` column from the `Area` class (model)
     """
 
-    def __init__(self, name, paths, transformfunc=None, trigger=True):
+    def __init__(self, name, paths, transformfunc=None, trigger=True, preserve_og=False):
         """
         :param str name: The name of the field.
         :param [str] paths: A dot-delimited path (or a list of them) along which
@@ -130,6 +129,8 @@ class SearchField(object):
         :param method trigger: Whether changes to the path should trigger an
                                update in the Solr core for the entity with
                                this field. Defaults to `True`.
+        :param method preserve_og: Flag to preserve original values and order.
+                                   Defaults to `False`.
         """
         self.name = name
         if not isinstance(paths, list):
@@ -137,6 +138,7 @@ class SearchField(object):
         self.paths = paths
         self.transformfunc = transformfunc
         self.trigger = trigger
+        self.preserve_og = preserve_og
 
 
 class SearchEntity(object):
@@ -274,8 +276,7 @@ class SearchEntity(object):
                 tempvals = field.transformfunc(tempvals)
 
             if (isinstance(tempvals, set) or isinstance(tempvals, list)):
-                # 'tracksmedium' can contain a list with same number of tracks on different mediums (ex: [3, 4, 3])
-                if fieldname not in DUPLICATION_ALLOWED_FIELD_NAMES:
+                if field.preserve_og is False:
                     tempvals = list(set(tempvals))
                 if len(tempvals) == 1:
                     tempvals = tempvals.pop()
@@ -288,9 +289,5 @@ class SearchEntity(object):
                         if isinstance(tempvals[idx], UUID):
                             tempvals[idx] = str(tempvals[idx])
                 data[fieldname] = tempvals
-
-        if (config.CFG.getboolean("sir", "wscompat") and self.compatconverter is
-            not None):
-            data["_store"] = str(tostring(self.compatconverter(obj).to_etree(), encoding='us-ascii'), encoding='us-ascii')
 
         return data
