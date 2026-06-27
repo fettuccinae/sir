@@ -272,6 +272,9 @@ class SearchEntity(object):
                             tempvals.extend(value)
                         else:
                             tempvals.append(value)
+                    else:
+                        if field.preserve_og is True:
+                            tempvals.append("")
             if field.transformfunc is not None:
                 tempvals = field.transformfunc(tempvals)
 
