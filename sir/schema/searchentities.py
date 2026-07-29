@@ -290,13 +290,13 @@ class SearchEntity(object):
             if field.transformfunc is not None:
                 tempvals = field.transformfunc(tempvals)
 
-            if (isinstance(tempvals, set) or isinstance(tempvals, list)):
+            if (isinstance(tempvals, (set, list))):
                 if field.preserve_og is False:
                     tempvals = list(set(tempvals))
                 if len(tempvals) == 1:
                     tempvals = tempvals.pop()
 
-            if tempvals is not None and tempvals:
+            if tempvals is not None and (tempvals or isinstance(tempvals, int)):
                 if isinstance(tempvals, UUID):
                     tempvals = str(tempvals)
                 elif isinstance(tempvals, list):
