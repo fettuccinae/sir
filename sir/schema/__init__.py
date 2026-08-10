@@ -37,30 +37,63 @@ from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.descriptor_props import CompositeProperty
 
 
-SearchAnnotation = E(modelext.CustomAnnotation, [
-    F("id", "id"),
-    F("entity", ["areas.area.gid", "artists.artist.gid", "events.event.gid",
-                 "instruments.instrument.gid", "labels.label.gid",
-                 "places.place.gid", "recordings.recording.gid",
-                 "releases.release.gid", "release_groups.release_group.gid",
-                 "series.series.gid", "works.work.gid"]),
-    F("name", ["areas.area.name", "artists.artist.name", "events.event.name",
-               "instruments.instrument.name", "labels.label.name",
-               "places.place.name", "recordings.recording.name",
-               "releases.release.name", "release_groups.release_group.name",
-               "series.series.name", "works.work.name"]),
-    F("text", "text"),
-    F("type", ["areas.__tablename__", "artists.__tablename__",
-               "events.__tablename__", "instruments.__tablename__",
-               "labels.__tablename__", "places.__tablename__",
-               "recordings.__tablename__", "releases.__tablename__",
-               "release_groups.__tablename__", "series.__tablename__",
-               "works.__tablename__"],
-      transformfunc=tfs.annotation_type)
-],
+SearchAnnotation = E(
+    modelext.CustomAnnotation,
+    [
+        F("id", "id"),
+        F(
+            "entity",
+            [
+                "areas.area.gid",
+                "artists.artist.gid",
+                "events.event.gid",
+                "instruments.instrument.gid",
+                "labels.label.gid",
+                "places.place.gid",
+                "recordings.recording.gid",
+                "releases.release.gid",
+                "release_groups.release_group.gid",
+                "series.series.gid",
+                "works.work.gid",
+            ],
+        ),
+        F(
+            "name",
+            [
+                "areas.area.name",
+                "artists.artist.name",
+                "events.event.name",
+                "instruments.instrument.name",
+                "labels.label.name",
+                "places.place.name",
+                "recordings.recording.name",
+                "releases.release.name",
+                "release_groups.release_group.name",
+                "series.series.name",
+                "works.work.name",
+            ],
+        ),
+        F("text", "text"),
+        F(
+            "type",
+            [
+                "areas.__tablename__",
+                "artists.__tablename__",
+                "events.__tablename__",
+                "instruments.__tablename__",
+                "labels.__tablename__",
+                "places.__tablename__",
+                "recordings.__tablename__",
+                "releases.__tablename__",
+                "release_groups.__tablename__",
+                "series.__tablename__",
+                "works.__tablename__",
+            ],
+            transformfunc=tfs.annotation_type,
+        ),
+    ],
     1.7,
-    convert.convert_annotation,
-    extraquery=queryext.filter_valid_annotations
+    extraquery=queryext.filter_valid_annotations,
 )
 
 
@@ -169,27 +202,25 @@ SearchArtist = E(modelext.CustomArtist, [
     1.7,
 )
 
-SearchCDStub = E(modelext.CustomReleaseRaw, [
-    F("id", "id"),
-    F("title", "title"),
-    F("artist", "artist"),
-    F("comment", "comment"),
-    F("barcode", "barcode"),
-    F("added", "added", transformfunc=tfs.datetime_to_timestamp),
-    F("tracks", "discids.track_count"),
-    F("discid", "discids.discid")
-],
+SearchCDStub = E(
+    modelext.CustomReleaseRaw,
+    [
+        F("id", "id"),
+        F("title", "title"),
+        F("artist", "artist"),
+        F("comment", "comment"),
+        F("barcode", "barcode"),
+        F("added", "added", transformfunc=tfs.datetime_to_timestamp),
+        F("tracks", "discids.track_count"),
+        F("discid", "discids.discid"),
+    ],
     1.7,
-    convert.convert_cdstub
 )
 
-SearchEditor = E(models.Editor, [
-    F("id", "id"),
-    F("bio", "bio"),
-    F("editor", "name")
-],
+SearchEditor = E(
+    models.Editor,
+    [F("id", "id"), F("bio", "bio"), F("editor", "name")],
     1.7,
-    convert.convert_editor
 )
 
 SearchEvent = E(modelext.CustomEvent, [
@@ -531,12 +562,10 @@ SearchSeries = E(modelext.CustomSeries, [
 )
 
 
-SearchTag = E(models.Tag, [
-    F("id", "id"),
-    F("tag", "name")
-],
+SearchTag = E(
+    models.Tag,
+    [F("id", "id"), F("tag", "name")],
     1.7,
-    convert.convert_standalone_tag
 )
 
 
