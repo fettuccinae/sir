@@ -274,21 +274,34 @@ SearchEvent = E(modelext.CustomEvent, [
                 "time"]
 )
 
-SearchInstrument = E(modelext.CustomInstrument, [
-    F("alias", "aliases.name"),
-    F("comment", "comment"),
-    F("description", "description"),
-    F("mbid", "gid"),
-    F("instrument", "name"),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name")
-],
+SearchInstrument = E(
+    modelext.CustomInstrument,
+    [
+        F("alias", "aliases.name"),
+        F("comment", "comment"),
+        F("description", "description"),
+        F("mbid", "gid"),
+        F("instrument", "name"),
+        F("tag", "tags.tag.name", preserve_og=True),
+        F("tag_count", "tags.count", preserve_og=True),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F(
+            "alias_json",
+            [
+                "aliases.type.name",
+                "aliases.type.id",
+                "aliases.sort_name",
+                "aliases.type.gid",
+                "aliases.locale",
+                "aliases.primary_for_locale",
+                "aliases.begin_date",
+                "aliases.end_date",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+    ],
     1.7,
-    convert.convert_instrument,
-    extrapaths=["aliases.type.name", "aliases.type.id",
-                "aliases.sort_name", "aliases.type.gid",
-                "aliases.locale", "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date", "tags.count", "type.gid"]
 )
 
 
