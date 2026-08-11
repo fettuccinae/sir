@@ -557,21 +557,33 @@ SearchReleaseGroup = E(modelext.CustomReleaseGroup, [
 )
 
 
-SearchSeries = E(modelext.CustomSeries, [
-    F("mbid", "gid"),
-    F("alias", "aliases.name"),
-    F("comment", "comment"),
-    F("series", "name"),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name")
-],
+SearchSeries = E(
+    modelext.CustomSeries,
+    [
+        F("mbid", "gid"),
+        F("series", "name"),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("alias", "aliases.name"),
+        F(
+            "alias_json",
+            [
+                "aliases.type.name",
+                "aliases.type.id",
+                "aliases.type.gid",
+                "aliases.sort_name",
+                "aliases.locale",
+                "aliases.primary_for_locale",
+                "aliases.begin_date",
+                "aliases.end_date",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("comment", "comment"),
+        F("tag", "tags.tag.name", preserve_og=True),
+        F("tag_count", "tags.count", preserve_og=True),
+    ],
     1.7,
-    convert.convert_series,
-    extrapaths=["tags.count",
-                "aliases.type.name", "aliases.type.id",
-                "aliases.type.gid", "aliases.sort_name",
-                "aliases.locale", "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date", "type.gid"]
 )
 
 
