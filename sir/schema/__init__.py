@@ -644,35 +644,40 @@ SearchTag = E(
 )
 
 
-SearchUrl = E(modelext.CustomURL, [
-    F("mbid", "gid"),
-    F("url", "url"),
-    F("relationtype", ["artist_links.link.link_type.name",
-                       "release_links.link.link_type.name"]),
-    F("targetid", ["artist_links.entity0.gid",
-                   "release_links.entity0.gid"]),
-    F("targettype", ["artist_links.__tablename__",
-                     "release_links.__tablename__"],
-      transformfunc=tfs.url_type),
-],
-    1.7,
-    convert.convert_url,
-    extrapaths=["artist_links.entity0.gid",
+SearchUrl = E(
+    modelext.CustomURL,
+    [
+        F("mbid", "gid"),
+        F("url", "url"),
+        F(
+            "relationtype",
+            ["artist_links.link.link_type.name", "release_links.link.link_type.name"],
+        ),
+        F("targetid", ["artist_links.entity0.gid", "release_links.entity0.gid"]),
+        F(
+            "targettype",
+            ["artist_links.__tablename__", "release_links.__tablename__"],
+            transformfunc=tfs.url_type,
+        ),
+        F(
+            "rel_json",
+            [
+                "artist_links.entity0.gid",
                 "artist_links.entity0.name",
                 "artist_links.entity0.comment",
                 "artist_links.entity0.sort_name",
                 "artist_links.link.link_type.name",
                 "artist_links.link.link_type.gid",
-                "artist_links.link.attributes.attribute_type.name",
-                "artist_links.link.attributes.attribute_type.gid",
                 "release_links.entity0.gid",
                 "release_links.entity0.name",
                 "release_links.entity0.comment",
                 "release_links.link.link_type.name",
                 "release_links.link.link_type.gid",
-                "release_links.link.attributes.attribute_type.name",
-                "release_links.link.attributes.attribute_type.gid",
-                ]
+            ],
+            objconverter=tfs.url_relations_to_json,
+        ),
+    ],
+    1.7,
 )
 
 

@@ -129,6 +129,45 @@ def area_relations_to_json(area):
     return relations
 
 
+def url_relations_to_json(url):
+    relations = []
+    for link in url.artist_links:
+        artist = link.artist
+        artist_dict = {"id": str(artist.gid), "name": artist.name}
+        if artist.comment:
+            artist_dict["disambiguation"] = artist.comment
+        if artist.sort_name is not None:
+            artist_dict["sort_name"] = artist.sort_name
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "artist",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "artist": artist_dict,
+                }
+            ).decode("utf-8")
+        )
+    for link in url.release_links:
+        release = link.release
+        release_dict = {"id": str(release.gid), "title": release.name}
+        if release.comment:
+            release_dict["disambiguation"] = release.comment
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "release",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "release": release_dict,
+                }
+            ).decode("utf-8")
+        )
+    return relations
+
+
 def qdur(durations):
     if len(durations):
         return durations.pop() // 2000
