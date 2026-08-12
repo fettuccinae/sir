@@ -352,29 +352,45 @@ SearchLabel = E(
 )
 
 
-SearchPlace = E(modelext.CustomPlace, [
-    F("mbid", "gid"),
-    F("address", "address"),
-    F("alias", "aliases.name"),
-    F("area", ["area.name", "area.aliases.name"]),
-    F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
-    F("comment", "comment"),
-    F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
-    F("ended", "ended", transformfunc=tfs.ended_to_string),
-    F("lat", "coordinates", transformfunc=tfs.lat),
-    F("long", "coordinates", transformfunc=tfs.long),
-    F("place", "name"),
-    F("type", "type.name")
-],
+SearchPlace = E(
+    modelext.CustomPlace,
+    [
+        F("mbid", "gid"),
+        F("place", "name"),
+        F("address", "address"),
+        F("comment", "comment"),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("area", ["area.name", "area.aliases.name"]),
+        F("area_name", "area.name"),
+        F("area_gid", "area.gid"),
+        F("area_begindate", "area.begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("area_enddate", "area.end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("area_ended", "area.ended", transformfunc=tfs.ended_to_string),
+        F("area_type_gid", "area.type.gid"),
+        F("area_type", "area.type.name"),
+        F("alias", "aliases.name"),
+        F(
+            "alias_json",
+            [
+                "aliases.type.name",
+                "aliases.type.id",
+                "aliases.type.gid",
+                "aliases.sort_name",
+                "aliases.locale",
+                "aliases.primary_for_locale",
+                "aliases.begin_date",
+                "aliases.end_date",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("ended", "ended", transformfunc=tfs.ended_to_string),
+        F("lat", "coordinates", transformfunc=tfs.lat),
+        F("long", "coordinates", transformfunc=tfs.long),
+    ],
     1.7,
-    convert.convert_place,
-    extrapaths=["aliases.type.name", "aliases.type.id",
-                "aliases.type.gid", "aliases.sort_name",
-                "aliases.locale", "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date",
-                "area.gid", "area.type.gid", "area.type.name",
-                "area.begin_date", "area.end_date", "area.ended",
-                "type.gid"]
 )
 
 
