@@ -681,40 +681,61 @@ SearchUrl = E(
 )
 
 
-SearchWork = E(modelext.CustomWork, [
-    F("mbid", "gid"),
-    F("work", "name"),
-    F("alias", "aliases.name"),
-    F("arid", "artist_links.entity0.gid", transformfunc=tfs.uuid_list_to_str_list),
-    F("artist", "artist_links.entity0.name"),
-    F("comment", "comment"),
-    F("iswc", "iswcs.iswc"),
-    F("lang", "languages.language.iso_code_3"),
-    F("recording", "recording_links.entity0.name"),
-    F("recording_count", "recording_links.entity0.gid", transformfunc=tfs.integer_count_all, trigger=False),
-    F("rid", "recording_links.entity0.gid"),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name")
-],
-    1.7,
-    convert.convert_work,
-    extrapaths=["aliases.type.name", "aliases.type.id",
+SearchWork = E(
+    modelext.CustomWork,
+    [
+        F("mbid", "gid"),
+        F("work", "name"),
+        F("alias", "aliases.name"),
+        F(
+            "alias_json",
+            [
+                "aliases.type.name",
+                "aliases.type.id",
                 "aliases.type.gid",
-                "aliases.sort_name", "aliases.locale",
+                "aliases.sort_name",
+                "aliases.locale",
                 "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date",
-                "artist_links.entity0.sort_name",
+                "aliases.begin_date",
+                "aliases.end_date",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("arid", "artist_links.entity0.gid", transformfunc=tfs.uuid_list_to_str_list),
+        F("artist", "artist_links.entity0.name"),
+        F("recording", "recording_links.entity0.name"),
+        F("rid", "recording_links.entity0.gid"),
+        F(
+            "rel_json",
+            [
+                "artist_links.entity0.gid",
+                "artist_links.entity0.name",
                 "artist_links.entity0.comment",
+                "artist_links.entity0.sort_name",
                 "artist_links.link.link_type.name",
                 "artist_links.link.link_type.gid",
-                "artist_links.link.attributes.attribute_type.name",
-                "artist_links.link.attributes.attribute_type.gid",
+                "recording_links.entity0.gid",
+                "recording_links.entity0.name",
+                "recording_links.entity0.video",
                 "recording_links.link.link_type.name",
                 "recording_links.link.link_type.gid",
-                "recording_links.link.attributes.attribute_type.name",
-                "recording_links.link.attributes.attribute_type.gid",
-                "recording_links.entity0.video",
-                "tags.count", "type.gid"]
+            ],
+            objconverter=tfs.work_relations_to_json,
+        ),
+        F("comment", "comment"),
+        F("iswc", "iswcs.iswc"),
+        F("lang", "languages.language.iso_code_3", preserve_og=True),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("tag", "tags.tag.name"),
+        F(
+            "recording_count",
+            "recording_links.entity0.gid",
+            transformfunc=tfs.integer_count_all,
+            trigger=False,
+        ),
+    ],
+    1.7,
 )
 
 

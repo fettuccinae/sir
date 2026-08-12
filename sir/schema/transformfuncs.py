@@ -168,6 +168,45 @@ def url_relations_to_json(url):
     return relations
 
 
+def work_relations_to_json(work):
+    relations = []
+    for link in work.artist_links:
+        artist = link.artist
+        artist_dict = {"id": str(artist.gid), "name": artist.name}
+        if artist.comment:
+            artist_dict["disambiguation"] = artist.comment
+        if artist.sort_name is not None:
+            artist_dict["sort_name"] = artist.sort_name
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "artist",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "artist": artist_dict,
+                }
+            ).decode("utf-8")
+        )
+    for link in work.recording_links:
+        recording = link.recording
+        recording_dict = {"id": str(recording.gid), "title": recording.name}
+        if recording.video:
+            recording_dict["video"] = True
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "recording",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "recording": recording_dict,
+                }
+            ).decode("utf-8")
+        )
+    return relations
+
+
 def qdur(durations):
     if len(durations):
         return durations.pop() // 2000
