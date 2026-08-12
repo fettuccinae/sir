@@ -305,35 +305,50 @@ SearchInstrument = E(
 )
 
 
-SearchLabel = E(modelext.CustomLabel, [
-    F("mbid", "gid"),
-    F("label", "name"),
-    F("alias", "aliases.name"),
-    F("area", ["area.name", "area.aliases.name"]),
-    F("country", "area.iso_3166_1_codes.code"),
-    F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
-    F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
-    F("ended", "ended", transformfunc=tfs.ended_to_string),
-
-    F("code", "label_code"),
-    F("comment", "comment"),
-    F("release_count", "release_count", transformfunc=tfs.integer_sum, trigger=False),
-    F("sortname", "aliases.sort_name"),
-    F("ipi", "ipis.ipi"),
-    F("isni", "isnis.isni"),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name")
-],
+SearchLabel = E(
+    modelext.CustomLabel,
+    [
+        F("mbid", "gid"),
+        F("label", "name"),
+        F("sortname", "aliases.sort_name"),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("area", ["area.name", "area.aliases.name"]),
+        F("area_name", "area.name"),
+        F("area_gid", "area.gid"),
+        F("area_begindate", "area.begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("area_enddate", "area.end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("area_ended", "area.ended", transformfunc=tfs.ended_to_string),
+        F("area_type_gid", "area.type.gid"),
+        F("area_type", "area.type.name"),
+        F("country", "area.iso_3166_1_codes.code"),
+        F("code", "label_code"),
+        F("alias", "aliases.name"),
+        F(
+            "alias_json",
+            [
+                "aliases.type.name",
+                "aliases.type.id",
+                "aliases.type.gid",
+                "aliases.sort_name",
+                "aliases.locale",
+                "aliases.primary_for_locale",
+                "aliases.begin_date",
+                "aliases.end_date",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("ipi", "ipis.ipi"),
+        F("isni", "isnis.isni"),
+        F("comment", "comment"),
+        F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("ended", "ended", transformfunc=tfs.ended_to_string),
+        F("tag", "tags.tag.name", preserve_og=True),
+        F("tag_count", "tags.count", preserve_og=True),
+        F("release_count", "release_count", transformfunc=tfs.integer_sum, trigger=False),
+    ],
     1.7,
-    convert.convert_label,
-    extrapaths=["aliases.type.name", "aliases.type.id",
-                "aliases.type.gid", "aliases.sort_name",
-                "aliases.locale", "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date",
-                "area.gid", "area.type.name", "area.type.gid",
-                "area.begin_date", "area.end_date", "area.ended",
-                "tags.count", "type.gid"
-                ]
 )
 
 
