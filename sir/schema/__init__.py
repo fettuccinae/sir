@@ -221,6 +221,7 @@ SearchArtist = E(modelext.CustomArtist, [
     1.7,
 )
 
+
 SearchCDStub = E(
     modelext.CustomReleaseRaw,
     [
@@ -236,62 +237,73 @@ SearchCDStub = E(
     1.7,
 )
 
+
 SearchEditor = E(
     models.Editor,
     [F("id", "id"), F("bio", "bio"), F("editor", "name")],
     1.7,
 )
 
-SearchEvent = E(modelext.CustomEvent, [
-    F("mbid", "gid"),
-    F("alias", "aliases.name"),
-    F("aid", "area_links.entity0.gid"),
-    F("area", "area_links.entity0.name"),
-    F("arid", "artist_links.entity0.gid", transformfunc=tfs.uuid_list_to_str_list),
-    F("artist", "artist_links.entity0.name"),
-    F("pid", "place_links.entity1.gid"),
-    F("place", "place_links.entity1.name"),
-    F("comment", "comment"),
-    F("event", "name"),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name"),
-    F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
-    F("ended", "ended", transformfunc=tfs.ended_to_string),
-    F("end", "end_date", transformfunc=tfs.index_partialdate_to_string)
-],
-    1.7,
-    convert.convert_event,
-    extrapaths=["aliases.type.name",
-                "aliases.type.id",
-                "aliases.type.gid",
+
+SearchEvent = E(
+    modelext.CustomEvent,
+    [
+        F("mbid", "gid"),
+        F("event", "name"),
+        F("comment", "comment"),
+        F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("ended", "ended", transformfunc=tfs.ended_to_string),
+        F("time", "time", transformfunc=tfs.index_time_to_string),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("alias", "aliases.name", preserve_og=True),
+        F(
+            "alias_json",
+            [
+                "aliases.name",
                 "aliases.sort_name",
                 "aliases.locale",
                 "aliases.primary_for_locale",
                 "aliases.begin_date",
                 "aliases.end_date",
-                "area_links.entity0.name",
+                "aliases.type.name",
+                "aliases.type.gid",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("tag", "tags.tag.name", preserve_og=True),
+        F("tag_count", "tags.count", preserve_og=True),
+        F("aid", "area_links.entity0.gid"),
+        F("area", "area_links.entity0.name"),
+        F("arid", "artist_links.entity0.gid", transformfunc=tfs.uuid_list_to_str_list),
+        F("artist", "artist_links.entity0.name"),
+        F("pid", "place_links.entity1.gid"),
+        F("place", "place_links.entity1.name"),
+        F(
+            "rel_json",
+            [
                 "area_links.entity0.gid",
+                "area_links.entity0.name",
                 "area_links.link.link_type.name",
                 "area_links.link.link_type.gid",
-                "area_links.link.attributes.attribute_type.name",
-                "area_links.link.attributes.attribute_type.gid",
                 "artist_links.entity0.gid",
                 "artist_links.entity0.name",
-                "artist_links.entity0.comment",
                 "artist_links.entity0.sort_name",
+                "artist_links.entity0.comment",
                 "artist_links.link.link_type.name",
                 "artist_links.link.link_type.gid",
-                "artist_links.link.attributes.attribute_type.name",
-                "artist_links.link.attributes.attribute_type.gid",
                 "place_links.entity1.gid",
                 "place_links.entity1.name",
                 "place_links.link.link_type.name",
                 "place_links.link.link_type.gid",
-                "place_links.link.attributes.attribute_type.name",
-                "place_links.link.attributes.attribute_type.gid",
-                "tags.count", "type.gid",
-                "time"]
+            ],
+            objconverter=tfs.event_relations_to_json,
+        ),
+    ],
+    1.7,
 )
+
 
 SearchInstrument = E(
     modelext.CustomInstrument,

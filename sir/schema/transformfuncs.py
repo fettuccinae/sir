@@ -207,6 +207,55 @@ def work_relations_to_json(work):
     return relations
 
 
+def event_relations_to_json(event):
+    relations = []
+    for link in event.area_links:
+        area = link.area
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "area",
+                    "type": link.link.link_type.name,
+                    "direction": "backward",
+                    "type_id": str(link.link.link_type.gid),
+                    "area": {"id": str(area.gid), "name": area.name},
+                }
+            ).decode("utf-8")
+        )
+    for link in event.artist_links:
+        artist = link.artist
+        artist_dict = {"id": str(artist.gid), "name": artist.name}
+        if artist.comment:
+            artist_dict["disambiguation"] = artist.comment
+        if artist.sort_name is not None:
+            artist_dict["sort_name"] = artist.sort_name
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "artist",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "artist": artist_dict,
+                }
+            ).decode("utf-8")
+        )
+    for link in event.place_links:
+        place = link.place
+        relations.append(
+            orjson.dumps(
+                {
+                    "target_type": "place",
+                    "direction": "backward",
+                    "type": link.link.link_type.name,
+                    "type_id": str(link.link.link_type.gid),
+                    "place": {"id": str(place.gid), "name": place.name},
+                }
+            ).decode("utf-8")
+        )
+    return relations
+
+
 def qdur(durations):
     if len(durations):
         return durations.pop() // 2000
