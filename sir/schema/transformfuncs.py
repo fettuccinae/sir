@@ -102,6 +102,33 @@ def aliases_to_json(artist):
     return aliases
 
 
+def area_relations_to_json(area):
+    relations = []
+    for link in area.area_links:
+        parent = link.entity0
+        parent_dict = {"id": str(parent.gid), "name": parent.name}
+        if parent.type is not None:
+            parent_dict["type"] = parent.type.name
+            parent_dict["type_id"] = str(parent.type.gid)
+        begin_date = partialdate_to_string(parent.begin_date)
+        if begin_date:
+            parent_dict["begin_date"] = begin_date
+        end_date = partialdate_to_string(parent.end_date)
+        if end_date:
+            parent_dict["end_date"] = end_date
+        parent_dict["ended"] = "true" if parent.ended else "false"
+
+        data = {
+            "direction": "backward",
+            "type": link.link.link_type.name,
+            "type_id": str(link.link.link_type.gid),
+            "target": str(parent.gid),
+            "area": parent_dict,
+        }
+        relations.append(orjson.dumps(data).decode("utf-8"))
+    return relations
+
+
 def qdur(durations):
     if len(durations):
         return durations.pop() // 2000

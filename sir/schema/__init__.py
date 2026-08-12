@@ -97,42 +97,61 @@ SearchAnnotation = E(
 )
 
 
-SearchArea = E(modelext.CustomArea, [
-    F("mbid", "gid"),
-    F("area", "name"),
-    F("alias", "aliases.name"),
-    F("comment", "comment"),
-    F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
-    F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
-    F("ended", "ended", transformfunc=tfs.ended_to_string),
-    F("iso1", "iso_3166_1_codes.code"),
-    F("iso2", "iso_3166_2_codes.code"),
-    F("iso3", "iso_3166_3_codes.code"),
-    F("sortname", "aliases.sort_name"),
-    F("ref_count", ["place_count", "label_count", "artist_count"], transformfunc=tfs.integer_sum, trigger=False),
-    F("tag", "tags.tag.name"),
-    F("type", "type.name")
-],
-    1.7,
-    convert.convert_area,
-    extrapaths=["aliases.type.name", "aliases.type.id",
-                "aliases.sort_name", "aliases.type.gid",
-                "aliases.locale", "aliases.primary_for_locale",
-                "aliases.begin_date", "aliases.end_date",
+SearchArea = E(
+    modelext.CustomArea,
+    [
+        F("mbid", "gid"),
+        F("area", "name"),
+        F("comment", "comment"),
+        F("begin", "begin_date", transformfunc=tfs.index_partialdate_to_string),
+        F("end", "end_date", transformfunc=tfs.index_partialdate_to_string),
+        F("ended", "ended", transformfunc=tfs.ended_to_string),
+        F("iso1", "iso_3166_1_codes.code"),
+        F("iso2", "iso_3166_2_codes.code"),
+        F("iso3", "iso_3166_3_codes.code"),
+        F("sortname", "aliases.sort_name"),
+        F(
+            "ref_count",
+            ["place_count", "label_count", "artist_count"],
+            transformfunc=tfs.integer_sum,
+            trigger=False,
+        ),
+        F("type", "type.name"),
+        F("type_gid", "type.gid"),
+        F("alias", "aliases.name", preserve_og=True),
+        F(
+            "alias_json",
+            [
+                "aliases.name",
+                "aliases.sort_name",
+                "aliases.locale",
+                "aliases.primary_for_locale",
+                "aliases.begin_date",
+                "aliases.end_date",
+                "aliases.type.name",
+                "aliases.type.gid",
+            ],
+            objconverter=tfs.aliases_to_json,
+        ),
+        F("tag", "tags.tag.name", preserve_og=True),
+        F("tag_count", "tags.count", preserve_og=True),
+        F(
+            "rel_json",
+            [
                 "area_links.entity0.name",
                 "area_links.entity0.gid",
                 "area_links.entity0.begin_date",
                 "area_links.entity0.end_date",
                 "area_links.entity0.ended",
-                "area_links.entity0.type.id",
                 "area_links.entity0.type.gid",
                 "area_links.entity0.type.name",
                 "area_links.link.link_type.name",
                 "area_links.link.link_type.gid",
-                "area_links.link.attributes.attribute_type.name",
-                "area_links.link.attributes.attribute_type.gid",
-                "tags.count", "type.gid"
-                ]
+            ],
+            objconverter=tfs.area_relations_to_json,
+        ),
+    ],
+    1.7,
 )
 
 
