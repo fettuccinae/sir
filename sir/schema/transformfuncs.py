@@ -366,18 +366,6 @@ def recording_releases_to_json(recording):
     return releases
 
 
-def release_group_calc_type(release_group):
-    if release_group.type is None:
-        return None
-    return calculate_type(release_group.type, release_group.secondary_types).name
-
-
-def release_group_calc_type_gid(release_group):
-    if release_group.type is None:
-        return None
-    return str(calculate_type(release_group.type, release_group.secondary_types).gid)
-
-
 def release_artist_credit_to_json(release):
     return orjson.dumps(_artist_credit_dict(release.artist_credit, False)).decode("utf-8")
 
@@ -435,6 +423,35 @@ def release_calc_type(release):
 
 def release_calc_type_gid(release):
     return release_group_calc_type_gid(release.release_group)
+
+
+def release_group_calc_type(release_group):
+    if release_group.type is None:
+        return None
+    return calculate_type(release_group.type, release_group.secondary_types).name
+
+
+def release_group_calc_type_gid(release_group):
+    if release_group.type is None:
+        return None
+    return str(calculate_type(release_group.type, release_group.secondary_types).gid)
+
+
+def release_group_artist_credit_to_json(release_group):
+    return orjson.dumps(
+        _artist_credit_dict(release_group.artist_credit, True)
+    ).decode("utf-8")
+
+
+def release_group_releases_to_json(release_group):
+    releases = []
+    for release in release_group.releases:
+        release_dict = {"id": str(release.gid), "title": release.name}
+        if release.status is not None:
+            release_dict["status"] = release.status.name
+            release_dict["status_id"] = str(release.status.gid)
+        releases.append(orjson.dumps(release_dict).decode("utf-8"))
+    return releases
 
 
 def qdur(durations):
