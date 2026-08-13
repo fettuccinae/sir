@@ -366,6 +366,77 @@ def recording_releases_to_json(recording):
     return releases
 
 
+def release_group_calc_type(release_group):
+    if release_group.type is None:
+        return None
+    return calculate_type(release_group.type, release_group.secondary_types).name
+
+
+def release_group_calc_type_gid(release_group):
+    if release_group.type is None:
+        return None
+    return str(calculate_type(release_group.type, release_group.secondary_types).gid)
+
+
+def release_artist_credit_to_json(release):
+    return orjson.dumps(_artist_credit_dict(release.artist_credit, False)).decode("utf-8")
+
+
+def _release_event_dict(country_date):
+    area = country_date.country.area
+    return {
+        "area": {
+            "id": str(area.gid),
+            "name": area.name,
+            "iso_3166_1_codes": [c.code for c in area.iso_3166_1_codes],
+        },
+        "date": partialdate_to_string(country_date.date),
+    }
+
+
+def release_events_to_json(release):
+    return [orjson.dumps(_release_event_dict(cd)).decode("utf-8") for cd in release.country_dates]
+
+
+def release_label_info_to_json(release):
+    label_infos = []
+    for release_label in release.labels:
+        label_info = {}
+        if release_label.catalog_number:
+            label_info["catalog_number"] = release_label.catalog_number
+        if release_label.label is not None:
+            label_info["label"] = {
+                "id": str(release_label.label.gid),
+                "name": release_label.label.name,
+            }
+        label_infos.append(orjson.dumps(label_info).decode("utf-8"))
+    return label_infos
+
+
+def release_mediums_to_json(release):
+    mediums = []
+    for medium in release.mediums:
+        medium_dict = {"id": str(medium.gid)}
+        if medium.format is not None:
+            medium_dict["format"] = medium.format.name
+        medium_dict["disc_count"] = len(medium.cdtocs)
+        medium_dict["track_count"] = medium.track_count
+        mediums.append(orjson.dumps(medium_dict).decode("utf-8"))
+    return mediums
+
+
+def release_barcode_none(release):
+    return "true" if release.barcode == "" else None
+
+
+def release_calc_type(release):
+    return release_group_calc_type(release.release_group)
+
+
+def release_calc_type_gid(release):
+    return release_group_calc_type_gid(release.release_group)
+
+
 def qdur(durations):
     if len(durations):
         return durations.pop() // 2000
