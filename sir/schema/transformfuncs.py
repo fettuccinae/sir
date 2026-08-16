@@ -77,6 +77,11 @@ def index_partialdatelist_to_string(date_list):
         date_list[idx] = partialdate_to_string(date_list[idx])
     return date_list
 
+def index_time_to_string(times):
+    if len(times):
+        return times.pop().strftime("%H:%M:%S")
+    return None
+
 
 def _alias_dict(alias) -> dict:
     alias_dict = {"name": alias.name}
