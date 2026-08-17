@@ -24,18 +24,17 @@ various tools for working with them.
 # Paths might need to be updated as a part of schema changes in the
 # MusicBrainz server.
 
-from sir.schema import queryext
-from sir.schema import modelext
-from sir.schema import transformfuncs as tfs
-from sir.schema.searchentities import SearchEntity as E, SearchField as F
-from sir.wscompat import convert
-from collections import OrderedDict
-from mbdata import models
-from collections import defaultdict
-from sqlalchemy.orm import class_mapper
-from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.descriptor_props import CompositeProperty
+from collections import OrderedDict, defaultdict
 
+from mbdata import models
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm.descriptor_props import CompositeProperty
+from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
+
+from sir.schema import modelext, queryext
+from sir.schema import transformfuncs as tfs
+from sir.schema.searchentities import SearchEntity as E
+from sir.schema.searchentities import SearchField as F
 
 SearchAnnotation = E(
     modelext.CustomAnnotation,
@@ -882,8 +881,11 @@ def generate_update_map():
 
     :rtype (dict, dict, dict, dict)
     """
-    from sir.query_generation.paths import (unique_split_paths, last_model_in_path,
-                                            second_last_model_in_path)
+    from sir.query_generation.paths import (
+        last_model_in_path,
+        second_last_model_in_path,
+        unique_split_paths,
+    )
 
     paths = defaultdict(set)
     column_map = defaultdict(set)
